@@ -1,0 +1,38 @@
+name: TerraformAzureWorkflow
+
+on:
+   push:
+       branches:
+           - main
+
+jobs:
+   SetUp:
+       name: terraformsetup
+       runs-on: ubuntu-latest
+       env:
+           ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+           ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+           ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+           ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+				
+       steps:
+           - name: checkout repository
+             uses: actions/checkout@v4
+
+
+           - name: set up terraform
+             uses: hashicorp/setup-terraform@v3 ###this syntax is specific to the work you are trying to do
+             with:
+               terraform_version: "1.1.7"
+
+           - name: terraform init
+             run: terraform init
+
+           - name: terraform validate
+             run: terraform validate
+          
+           - name: terraform plan
+             run: terraform plan -out=tfplan
+
+           - name: terraform apply
+             run: terraform apply -auto-approve tfplan
